@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS tag (
 );
 
 CREATE TABLE IF NOT EXISTS note_tags (
-	"note_id" uuid DEFAULT (uuid_generate_v4()),
-	"tag_id"  uuid DEFAULT (uuid_generate_v4()),
+	"note_id" uuid,
+	"tag_id"  uuid,
 	PRIMARY KEY(note_id, tag_id),
 	CONSTRAINT fk_note FOREIGN KEY(note_id) REFERENCES note ("id"), 
 	CONSTRAINT fk_tag FOREIGN KEY(tag_id) REFERENCES tag("id") 
