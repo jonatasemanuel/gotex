@@ -1,11 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/jonatasemanuel/gote-server/database"
+	"github.com/jonatasemanuel/gote-server/router"
+	"github.com/jonatasemanuel/gote-server/services"
 )
 
 type Config struct {
@@ -14,10 +18,9 @@ type Config struct {
 
 type Application struct {
 	Config Config
-	// Models services.Models
+	Models services.Models
 }
 
-/*
 func (app *Application) Serve() error {
 	err := godotenv.Load()
 	if err != nil {
@@ -32,7 +35,7 @@ func (app *Application) Serve() error {
 	}
 
 	return srv.ListenAndServe()
-} */
+}
 
 func main() {
 	err := godotenv.Load()
@@ -40,9 +43,9 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// cfg := Config{
-	// 	Port: os.Getenv("PORT"),
-	// }
+	cfg := Config{
+		Port: os.Getenv("PORT"),
+	}
 
 	dsn := os.Getenv("DSN")
 	dbConn, err := database.ConnectDatabase(dsn)
@@ -51,14 +54,14 @@ func main() {
 	}
 	defer dbConn.DB.Close()
 
-	// app := &Application{
-	// 	Config: cfg,
-	// 	// Models: services.New(dbConn.DB),
-	// }
-	//
-	// err = app.Serve()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	app := &Application{
+		Config: cfg,
+		Models: services.New(dbConn.DB),
+	}
+
+	err = app.Serve()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
