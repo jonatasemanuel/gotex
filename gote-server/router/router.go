@@ -22,7 +22,10 @@ func Routes() http.Handler {
 	}))
 
 	router.Get("/api/v1/notes", controllers.GetAllNotes)
+	router.Get("/api/v1/notes/{id}", controllers.GetNoteById)
 	router.Post("/api/v1/notes", controllers.CreateNote)
+	router.Put("/api/v1/notes/{id}", controllers.UpdateNote)
+	router.Delete("/api/v1/notes/{id}", controllers.DeleteNote)
 
 	return router
 }
