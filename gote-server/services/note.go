@@ -14,6 +14,36 @@ type Note struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+func (n *Note) GetNoteById(id string) (*Note, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `SELECT
+		id,
+		title,
+		description,
+		content,
+		created_at,
+		updated_at FROM note WHERE id = $1
+	`
+	var note Note
+
+	row := db.QueryRowContext(ctx, query, id)
+	err := row.Scan(
+		&note.ID,
+		&note.Title,
+		&note.Description,
+		&note.Content,
+		&note.CreatedAt,
+		&note.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &note, nil
+}
+
 func (n *Note) GetAllNotes() ([]*Note, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
@@ -74,4 +104,45 @@ func (n *Note) CreateNote(note Note) (*Note, error) {
 	}
 
 	return &note, nil
+}
+
+func (n *Note) UpdateNote(id string, body Note) (*Note, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `UPDATE note SET
+		title = $1,
+		description = $2,
+		content = $3,
+		updated_at = $4
+		WHERE id = $5
+		RETURNING *
+	`
+	_, err := db.ExecContext(
+		ctx,
+		query,
+		body.Title,
+		body.Description,
+		body.Content,
+		time.Now(),
+		id,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &body, nil
+}
+
+func (n *Note) DeleteNote(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `DELETE FROM note WHERE id = $1`
+	_, err := db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
