@@ -27,5 +27,7 @@ func Routes() http.Handler {
 	router.Put("/api/v1/notes/{id}", controllers.UpdateNote)
 	router.Delete("/api/v1/notes/{id}", controllers.DeleteNote)
 
+	router.Get("/api/v1/tags", controllers.GetAllTags)
+	router.Post("/api/v1/tags", controllers.CreateTag)
 	return router
 }
